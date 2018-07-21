@@ -5,6 +5,7 @@ import model.Coefficients;
 import model.MatrixContacts;
 import model.VectorsDTO;
 import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import services.Utils;
 
 import java.util.ArrayList;
@@ -16,18 +17,20 @@ public class Instantiation {
     public static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
-        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 5);
+        double probability = Math.random()/10;
+        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 5, probability);
     }
 
     public static MatrixContacts initMatrixContacts(Coefficients coefficients) {
         Random random = new Random();
+        RandomDataGenerator binomialDistribution = new RandomDataGenerator();
         MatrixContacts matrixContacts = new MatrixContacts(coefficients.getQuantityOfPeople());
         int avgPeopleValue;
         int columnDecrement = coefficients.getQuantityOfPeople() - 1;
 
         for (int row = coefficients.getQuantityOfPeople() - 1; row >= 0; row--) {
             int counter = 0;
-            avgPeopleValue = (int) Math.round(Math.random() * (coefficients.getMaxPeoples() - coefficients.getMinPeoples()) + coefficients.getMinPeoples());
+            avgPeopleValue = binomialDistribution.nextBinomial(coefficients.getQuantityOfPeople(),coefficients.getProbability());
             for (int column = columnDecrement; column >= 0; column--) {
                 matrixContacts.matrix[column][row] = random.nextInt(2);
                 matrixContacts.matrix[row][column] = matrixContacts.matrix[column][row] == 1 ? 1 : 0;
@@ -51,8 +54,8 @@ public class Instantiation {
         vectorI = Utils.vectorMinusVector(vectorI, vectorG);
         agents = becameIllPeopleFromVectorI(vectorI, agents);
         MatrixContacts matrixContacts = initMatrixContacts(coefficients);
-        List<Integer> vectorRG = getVectorWithRandomElement(matrixContacts, coefficients.getMaxContactsBecameIll());
-        List<Integer> vectorRI = getVectorWithRandomElement(matrixContacts, coefficients.getMaxContactsBecameIll());
+        List<Integer> vectorRG = getVectorWithRandomElement(matrixContacts, coefficients);
+        List<Integer> vectorRI = getVectorWithRandomElement(matrixContacts, coefficients);
 
         return new VectorsDTO(agents, vectorS, vectorI, vectorG, vectorRG, vectorRI, matrixContacts);
     }
@@ -77,8 +80,8 @@ public class Instantiation {
         return agents;
     }
 
-    private static List<Integer> getVectorWithRandomElement(MatrixContacts matrixContacts, int maxContactsBecameIll) {
-        Random random = new Random();
+    private static List<Integer> getVectorWithRandomElement(MatrixContacts matrixContacts, Coefficients coefficients) {
+        RandomDataGenerator binomialDistribution = new RandomDataGenerator();
         boolean flag;
         int value;
         List<Integer> vectorWithRandomElements = new ArrayList<Integer>();
@@ -87,8 +90,8 @@ public class Instantiation {
         for (int i = 0; i < matrixContacts.getQuantityOfPeople(); i++) {
             flag = true;
             while (flag) {
-                value = random.nextInt(maxContactsBecameIll + 1);
-                if (value <= vectorContacts.get(i)) {
+                value = binomialDistribution.nextBinomial(/*coefficients.getMaxContactsBecameIll()*/vectorContacts.get(i),coefficients.getProbability());
+                if (value <= vectorContacts.get(i) && value <= coefficients.getMaxContactsBecameIll()) {
                     vectorWithRandomElements.add(value);
                     flag = false;
                 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Main {
 
-    private static final int quantityOfPeople = 5000;
+    private static final int quantityOfPeople = 2000;
     private static final String FILE_NAME = "Data.xlsx";
     private static List<statisticsGVI> statistics = new ArrayList<statisticsGVI>();
 
