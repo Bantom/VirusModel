@@ -1,6 +1,6 @@
 package excel;
 
-import model.statisticsGVI;
+import model.StatisticsGVI;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -13,15 +13,15 @@ import java.util.List;
 
 public class ImportFromExcel {
 
-    public static List<statisticsGVI> readSeasonsFromFile(String fileName) {
-        List<statisticsGVI> result = new ArrayList<>();
+    public static List<StatisticsGVI> readSeasonsFromFile(String fileName) {
+        List<StatisticsGVI> result = new ArrayList<>();
         try {
             Workbook workbook = new XSSFWorkbook(new FileInputStream(new File(fileName)));
             Sheet datatypeSheet = workbook.getSheetAt(0);
 
             for (Row currentRow : datatypeSheet) {
                 Iterator<Cell> cellIterator = currentRow.iterator();
-                statisticsGVI statictics = new statisticsGVI();
+                StatisticsGVI statictics = new StatisticsGVI();
                 int i = 1;
                 while (cellIterator.hasNext()) {
                     Cell currentCell = cellIterator.next();

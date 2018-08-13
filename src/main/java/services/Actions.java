@@ -1,14 +1,10 @@
 package services;
 
-import excel.ImportFromExcel;
-import model.*;
-import org.apache.poi.ss.formula.functions.T;
-import services.Utils;
+import model.Agent;
+import model.MatrixContacts;
+import model.VectorsDTO;
 
 import java.util.List;
-import java.util.OptionalDouble;
-
-import static java.lang.Math.abs;
 
 
 public class Actions {
@@ -20,10 +16,10 @@ public class Actions {
         for (int i = 0; i < vectorS.size(); i++) {
             if (
                     vectorS.get(i) == 1
-                    && counterOfVaccinated <= peopleQuantityForVaccination
-                    && !agents.get(i).isVaccinated()
-                    && !agents.get(i).isIll()
-                    ) {
+                            && counterOfVaccinated <= peopleQuantityForVaccination
+                            && !agents.get(i).isVaccinated()
+                            && !agents.get(i).isIll()
+            ) {
                 agents.get(i).setVaccinated(true);
                 counterOfVaccinated++;
             }
@@ -41,7 +37,7 @@ public class Actions {
                 counterIll = 0;
 
                 for (int j = 0; j < matrixContacts.getQuantityOfPeople(); j++) {
-                    if (matrixContacts.matrix[i][j] == 1 && vectorS.get(j) == 1 && counterIll <= r0 ) {
+                    if (matrixContacts.matrix[i][j] == 1 && vectorS.get(j) == 1 && counterIll <= r0) {
                         newVectorG.set(j, 1);
                         counterIll++;
                     }
@@ -49,22 +45,6 @@ public class Actions {
             }
         }
         return newVectorG;
-    }
-
-    public static void showCoefficients(Coefficients coefficients, List<Integer> vectorRG, List<Integer> vectorRI) {
-        System.out.println(coefficients.toString());
-        System.out.println("avg RG: " + getAverageValueR0(vectorRG));
-        System.out.println("avg RI: " + getAverageValueR0(vectorRI));
-        System.out.println("RG: " + vectorRG);
-        System.out.println("RI: " + vectorRI);
-    }
-
-    private static double getAverageValueR0(List<Integer> vectorR0) {
-        OptionalDouble average = vectorR0
-                .stream()
-                .mapToDouble(a -> a)
-                .average();
-        return average.isPresent() ? average.getAsDouble() : 0;
     }
 
     private static int negativeValueToZero(int value) {
@@ -98,55 +78,6 @@ public class Actions {
             }
         }
         return new VectorsDTO(agents, newVectorI);
-    }
-
-    public static double getStatisticsG(List<Integer> vectorG) {
-        return (double) getPeopleQuantity(vectorG) / vectorG.size();
-    }
-
-    public static double getStatisticsI(List<Integer> vectorI) {
-        return (double) getPeopleQuantity(vectorI) / vectorI.size();
-    }
-
-    public static double getStatisticsV(List<Agent> agents) {
-        int counter = 0;
-        for (Agent agent : agents) {
-            counter += agent.isVaccinated() ? 1 : 0;
-        }
-        return (double) counter/agents.size();
-    }
-
-    public static void showStatisticsGVI(List<statisticsGVI> statistics) {
-        statistics.forEach(System.out::println);
-    }
-
-    public static void showErrors(String fileName, List<statisticsGVI> statistics) {
-        List<statisticsGVI> staticticsFromFile = ImportFromExcel.readSeasonsFromFile(fileName);
-        double squareErrorI = 0;
-        double squareErrorG = 0;
-        double squareErrorV = 0;
-
-        for (int i = 0; i < 33; i++) {
-            squareErrorI += Math.pow(statistics.get(i).getI() - staticticsFromFile.get(i).getI(),2);
-            squareErrorG += Math.pow(statistics.get(i).getG() - staticticsFromFile.get(i).getG(),2);
-            squareErrorV += Math.pow(statistics.get(i).getV() - staticticsFromFile.get(i).getV(),2);
-        }
-
-        squareErrorI = Math.sqrt(squareErrorI/(statistics.size()*(statistics.size() - 1)));
-        squareErrorG = Math.sqrt(squareErrorG/(statistics.size()*(statistics.size() - 1)));
-        squareErrorV = Math.sqrt(squareErrorV/(statistics.size()*(statistics.size() - 1)));
-
-        System.out.println("SquareErrorI: " + squareErrorI);
-        System.out.println("SquareErrorG: " + squareErrorG);
-        System.out.println("SquareErrorV: " + squareErrorV);
-    }
-
-    private static int getPeopleQuantity(List<Integer> vector) {
-        int counter = 0;
-        for (Integer aVector : vector) {
-            counter += aVector;
-        }
-        return counter;
     }
 
     private static boolean isAgentHere(int isAgent) {

@@ -11,8 +11,9 @@ import services.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
-public class Instantiation {
+public class InstantiationService {
 
     public static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
@@ -29,7 +30,7 @@ public class Instantiation {
         int columnDecrement = coefficients.getQuantityOfPeople() - 1;
 
         for (int row = coefficients.getQuantityOfPeople() - 1; row >= 0; row--) {
-            int counter = 0;
+            int counter;
             avgPeopleValue = binomialDistribution.nextBinomial(coefficients.getQuantityOfPeople(),coefficients.getProbability());
             for (int column = columnDecrement; column >= 0; column--) {
                 matrixContacts.matrix[column][row] = random.nextInt(2);
@@ -48,8 +49,8 @@ public class Instantiation {
 
     public static VectorsDTO initVectors(Coefficients coefficients) {
         List<Agent> agents = getAgents(coefficients.getQuantityOfPeople());
-        List<Integer> vectorI = getVectorsWithRandomOneOrZeroValues(coefficients.getQuantityOfPeople());
-        List<Integer> vectorS = Utils.vectorMinusVector(getVectorWithValuesOne(coefficients.getQuantityOfPeople()), vectorI);
+        List<Integer> vectorI = Utils.getVectorsWithRandomOneOrZeroValues(coefficients.getQuantityOfPeople());
+        List<Integer> vectorS = Utils.vectorMinusVector(Utils.getVectorWithValuesOne(coefficients.getQuantityOfPeople()), vectorI);
         List<Integer> vectorG = initVectorG(vectorI);
         vectorI = Utils.vectorMinusVector(vectorI, vectorG);
         agents = becameIllPeopleFromVectorI(vectorI, agents);
@@ -72,12 +73,10 @@ public class Instantiation {
     }
 
     private static List<Agent> getAgents(int quantityOfPeople) {
-        List<Agent> agents = new ArrayList<Agent>();
-
-        for (int i = 0; i < quantityOfPeople; i++) {
-            agents.add(new Agent());
-        }
-        return agents;
+        return Stream
+                .generate(Agent::new)
+                .limit(quantityOfPeople)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
     private static List<Integer> getVectorWithRandomElement(MatrixContacts matrixContacts, Coefficients coefficients) {
@@ -122,29 +121,8 @@ public class Instantiation {
 
     private static List<Integer> initVectorG(List<Integer> vectorI) {
         List<Integer> vectorG = Utils.cloneFromVector(vectorI);
-        vectorG = Utils.vectorMinusVector(vectorG, getVectorsWithRandomOneOrZeroValues(vectorG.size()));
+        vectorG = Utils.vectorMinusVector(vectorG, Utils.getVectorsWithRandomOneOrZeroValues(vectorG.size()));
         vectorG = Utils.negativeElementsToZero(vectorG);
         return vectorG;
     }
-
-    private static List<Integer> getVectorsWithRandomOneOrZeroValues(int size) {
-        List<Integer> vector = new ArrayList<Integer>();
-        Random random = new Random();
-
-        for (int i = 0; i < size; i++) {
-            vector.add(random.nextInt(2) > 0 ? 1 : 0);
-        }
-        return vector;
-    }
-
-    private static List<Integer> getVectorWithValuesOne(int size) {
-        List<Integer> vectorS = new ArrayList<Integer>();
-
-        for (int i = 0; i < size; i++) {
-            vectorS.add(1);
-        }
-        return vectorS;
-    }
-
-
 }

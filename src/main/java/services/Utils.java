@@ -2,6 +2,11 @@ package services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 public class Utils {
 
@@ -25,27 +30,33 @@ public class Utils {
         return result;
     }
 
-    public static List cloneFromVector(List<Integer> vectorToClone) {
-        List<Integer> result = new ArrayList<Integer>();
-
-        result.addAll(vectorToClone);
-        return result;
+    public static List<Integer> cloneFromVector(List<Integer> vectorToClone) {
+        return new ArrayList<>(vectorToClone);
     }
 
     public static List<Integer> negativeElementsToZero(List<Integer> vector) {
-        List<Integer> result = new ArrayList<Integer>();
-
-        for (Integer aVector : vector) {
-            result.add(aVector > 0 ? 1 : 0);
-        }
-        return result;
+        return vector.stream()
+                .map(v -> v > 0 ? 1 : 0)
+                .collect(toList());
     }
 
     public static List<Integer> getVectorWithZeroValues(int size) {
-        List<Integer> result = new ArrayList<Integer>();
-        for (int i = 0; i < size; i++) {
-            result.add(0);
-        }
-        return result;
+        return IntStream
+                .generate(() -> 0)
+                .limit(size)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    public static List<Integer> getVectorWithValuesOne(int size) {
+        return IntStream
+                .generate(() -> 1)
+                .limit(size)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    public static List<Integer> getVectorsWithRandomOneOrZeroValues(int size) {
+        return new Random()
+                .ints(size, 0, 2)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 }
