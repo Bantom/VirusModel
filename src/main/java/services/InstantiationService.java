@@ -4,9 +4,7 @@ import model.Agent;
 import model.Coefficients;
 import model.MatrixContacts;
 import model.VectorsDTO;
-import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.RandomDataGenerator;
-import services.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +13,14 @@ import java.util.stream.Stream;
 
 public class InstantiationService {
 
-    public static Coefficients initCoefficients(int quantityOfPeople) {
+    static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
-        double probability = Math.random()/10;
-        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 5, probability);
+        double probability = Math.random() / 10;
+        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 8, probability);
     }
 
-    public static MatrixContacts initMatrixContacts(Coefficients coefficients) {
+    private static MatrixContacts initMatrixContacts(Coefficients coefficients) {
         Random random = new Random();
         RandomDataGenerator binomialDistribution = new RandomDataGenerator();
         MatrixContacts matrixContacts = new MatrixContacts(coefficients.getQuantityOfPeople());
@@ -31,7 +29,7 @@ public class InstantiationService {
 
         for (int row = coefficients.getQuantityOfPeople() - 1; row >= 0; row--) {
             int counter;
-            avgPeopleValue = binomialDistribution.nextBinomial(coefficients.getQuantityOfPeople(),coefficients.getProbability());
+            avgPeopleValue = binomialDistribution.nextBinomial(coefficients.getQuantityOfPeople(), coefficients.getProbability());
             for (int column = columnDecrement; column >= 0; column--) {
                 matrixContacts.matrix[column][row] = random.nextInt(2);
                 matrixContacts.matrix[row][column] = matrixContacts.matrix[column][row] == 1 ? 1 : 0;
@@ -62,7 +60,7 @@ public class InstantiationService {
     }
 
     private static List<Agent> becameIllPeopleFromVectorI(List<Integer> vectorI, List<Agent> agents) {
-        if ( vectorI.size() != agents.size()) throw new IllegalArgumentException("Sizes of vectors I and Agent are different.");
+        if (vectorI.size() != agents.size()) throw new IllegalArgumentException("Sizes of vectors I and Agent are different.");
 
         for (int i = 0; i < vectorI.size(); i++) {
             if (vectorI.get(i) == 1) {
@@ -89,7 +87,7 @@ public class InstantiationService {
         for (int i = 0; i < matrixContacts.getQuantityOfPeople(); i++) {
             flag = true;
             while (flag) {
-                value = binomialDistribution.nextBinomial(/*coefficients.getMaxContactsBecameIll()*/vectorContacts.get(i),coefficients.getProbability());
+                value = setMaxIllContactsInsteadOfBigNumbers(binomialDistribution.nextBinomial(vectorContacts.get(i), coefficients.getProbability()), coefficients.getMaxContactsBecameIll());
                 if (value <= vectorContacts.get(i) && value <= coefficients.getMaxContactsBecameIll()) {
                     vectorWithRandomElements.add(value);
                     flag = false;
@@ -124,5 +122,9 @@ public class InstantiationService {
         vectorG = Utils.vectorMinusVector(vectorG, Utils.getVectorsWithRandomOneOrZeroValues(vectorG.size()));
         vectorG = Utils.negativeElementsToZero(vectorG);
         return vectorG;
+    }
+
+    private static int setMaxIllContactsInsteadOfBigNumbers(int numbersBecameIll, int maxIllContacts) {
+        return numbersBecameIll > maxIllContacts ? maxIllContacts : numbersBecameIll;
     }
 }
