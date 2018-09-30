@@ -8,6 +8,7 @@ import lombok.ToString;
 public class Agent {
     private boolean vaccinated = false;
     private boolean ill = false;
+    private boolean susceptible = true;
 
     public boolean isVaccinated() {
         return vaccinated;
@@ -15,5 +16,9 @@ public class Agent {
 
     public boolean isIll() {
         return ill;
+    }
+
+    public boolean isSusceptible() {
+        return susceptible;
     }
 }

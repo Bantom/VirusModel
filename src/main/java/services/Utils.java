@@ -59,4 +59,12 @@ public class Utils {
                 .ints(size, 0, 2)
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
+
+    public static int countPeopleFromVector(List<Integer> vector) {
+        int counter = 0;
+        for (int entry : vector) {
+            counter += entry;
+        }
+        return counter;
+    }
 }

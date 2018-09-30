@@ -1,10 +1,12 @@
 package services;
 
 import model.Agent;
+import model.Coefficients;
 import model.MatrixContacts;
 import model.VectorsDTO;
 
 import java.util.List;
+import java.util.Random;
 
 
 public class Actions {
@@ -69,7 +71,7 @@ public class Actions {
                 counterIll = 0;
 
                 for (int j = 0; j < matrixContacts.getQuantityOfPeople(); j++) {
-                    if (matrixContacts.matrix[i][j] == 1 && vectorS.get(j) == 1 && counterIll <= r0 && !agents.get(j).isVaccinated() && !agents.get(j).isIll()) {
+                    if (matrixContacts.matrix[i][j] == 1 && vectorS.get(j) == 1 && counterIll <= r0 && !agents.get(j).isVaccinated() && !agents.get(j).isIll() && agents.get(j).isSusceptible()) {
                         newVectorI.set(j, 1);
                         agents.get(j).setIll(true);
                         counterIll++;
@@ -80,11 +82,69 @@ public class Actions {
         return new VectorsDTO(agents, newVectorI);
     }
 
+    public static List<Integer> movePeopleFromItoY(List<Integer> vectorI, Coefficients coefficients) {
+        List<Integer> vectorY = Utils.getVectorWithZeroValues(vectorI.size());
+        int quantityComplicatedPeople = (int) Math.round(Utils.countPeopleFromVector(vectorI) * coefficients.getComplicationProbabilityY());
+        for (int i = 0; i < vectorI.size(); i++) {
+            if (quantityComplicatedPeople != 0) {
+                if (vectorI.get(i) == 1) {
+                    vectorY.set(i,1);
+                    vectorI.set(i,0);
+                    quantityComplicatedPeople--;
+                }
+            } else {
+                break;
+            }
+        }
+        return vectorY;
+    }
+
     private static boolean isAgentHere(int isAgent) {
         return isAgent == 1;
     }
 
     private static double getPercentsStoV(int weekNumber) {
         return (1 / (0.13 * Math.exp((weekNumber + 0.1) * 0.4)) + Math.random()) / 1000;
+    }
+
+    public static List<Integer> movePeopleFromYtoS(List<Integer> vectorY, List<Integer> vectorS) {
+        return Utils.vectorPlusVector(vectorS, vectorY);
+    }
+
+    public static List<Integer> movePeopleFromOtoS(List<Integer> vectorO, List<Integer> vectorS) {
+        return Utils.vectorPlusVector(vectorS, vectorO);
+    }
+
+    public static List<Integer> movePeopleFromGtoO(List<Integer> vectorG, Coefficients coefficients) {
+        List<Integer> vectorO = Utils.getVectorWithZeroValues(vectorG.size());
+        int quantityComplicatedPeople = (int) Math.round(Utils.countPeopleFromVector(vectorG) * coefficients.getComplicationProbabilityO());
+        for (int i = 0; i < vectorG.size(); i++) {
+            if (quantityComplicatedPeople != 0) {
+                if (vectorG.get(i) == 1) {
+                    vectorO.set(i,1);
+                    vectorG.set(i,0);
+                    quantityComplicatedPeople--;
+                }
+            } else {
+                break;
+            }
+        }
+        return vectorO;
+    }
+
+    public static List<Agent> makePeopleBecameUnsusceptible(List<Agent> agents, Coefficients coefficients) {
+        int quantityUnsusceptiblePeople = (int) Math.round(coefficients.getQuantityOfPeople() * coefficients.getSusceptibleProbability());
+        int counterUnsusceptiblePeople = 0;
+        while (quantityUnsusceptiblePeople > counterUnsusceptiblePeople) {
+            for (int i = 0; i < agents.size(); i++) {
+                double randomValue = Math.random();
+                if (quantityUnsusceptiblePeople == counterUnsusceptiblePeople) break;
+                if (agents.get(i).isSusceptible() && randomValue > 0.5) {
+                    agents.get(i).setSusceptible(false);
+                    counterUnsusceptiblePeople++;
+                }
+            }
+        }
+        return agents;
     }
 }

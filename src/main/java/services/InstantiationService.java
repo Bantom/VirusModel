@@ -17,7 +17,10 @@ public class InstantiationService {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
         double probability = Math.random() / 10;
-        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 8, probability);
+        double complicationProbabilityY = Math.random() / 10;
+        double complicationProbabilityO = Math.random() / 10;
+        double susceptibleProbability = Math.random() / 10;
+        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 8, probability, complicationProbabilityY, complicationProbabilityO, susceptibleProbability);
     }
 
     private static MatrixContacts initMatrixContacts(Coefficients coefficients) {

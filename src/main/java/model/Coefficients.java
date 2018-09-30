@@ -17,4 +17,7 @@ public class Coefficients {
     private int minContactsBecameIll;
     private int maxContactsBecameIll;
     private double probability;
+    private double complicationProbabilityY;
+    private double complicationProbabilityO;
+    private double susceptibleProbability;
 }
