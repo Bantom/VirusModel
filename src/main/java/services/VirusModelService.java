@@ -5,6 +5,8 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
+import java.util.stream.Collectors;
 
 public class VirusModelService {
 
@@ -19,13 +21,43 @@ public class VirusModelService {
             }
         }
 
-        return chooseResultWithMinimalError(bestResultsForCoefficients);
+        return chooseResultWithMinimalError(bestResultsForCoefficients, dataFilename);
     }
 
-    private static StatisticsAndCoefficients chooseResultWithMinimalError(List<StatisticsAndCoefficients> listStatistics) {
-        return listStatistics.stream()
-                .reduce((u1, u2) -> u1.getGeneralError() < u2.getGeneralError() ? u1 : u2)
-                .orElse(null);
+    private static StatisticsAndCoefficients chooseResultWithMinimalError(List<StatisticsAndCoefficients> listStatistics, String fileName) {
+        List<StatisticsGVI> staticticsFromFile = ImportFromExcel.readSeasonsFromFile(fileName);
+        List<Double> gStatistics = staticticsFromFile.stream().map(StatisticsGVI::getG).collect(Collectors.toList());
+        List<Double> vStatistics = staticticsFromFile.stream().map(StatisticsGVI::getV).collect(Collectors.toList());
+        List<Double> iStatistics = staticticsFromFile.stream().map(StatisticsGVI::getI).collect(Collectors.toList());
+
+        List<Double> sumCorrelationCoefficients = new ArrayList<>();
+
+
+        for (int j = 0; j < listStatistics.size(); j++) {
+            List<StatisticsGVI> statisticsGVI = listStatistics.get(j).getStatisticsGVI();
+            List<Double> g = statisticsGVI.stream().map(StatisticsGVI::getG).collect(Collectors.toList());
+            List<Double> v = statisticsGVI.stream().map(StatisticsGVI::getV).collect(Collectors.toList());
+            List<Double> i = statisticsGVI.stream().map(StatisticsGVI::getI).collect(Collectors.toList());
+
+            double gcorCoef = getCorrelationCoefficient(g, gStatistics);
+            double vcorCoef = getCorrelationCoefficient(v, vStatistics);
+            double icorCoef = getCorrelationCoefficient(i, iStatistics);
+            sumCorrelationCoefficients.add(j, Math.abs(gcorCoef) + Math.abs(vcorCoef) + Math.abs(icorCoef));
+        }
+        OptionalDouble maxValue = sumCorrelationCoefficients.stream().mapToDouble(Double::doubleValue).max();
+
+        int numberOfBestExperiment = 0;
+        for (int i = 0; i < sumCorrelationCoefficients.size(); i++) {
+            if (sumCorrelationCoefficients.get(i) == maxValue.getAsDouble()) {
+                numberOfBestExperiment = i;
+                break;
+            }
+        }
+        return listStatistics.get(numberOfBestExperiment);
+
+//        return listStatistics.stream()
+//                .reduce((u1, u2) -> u1.getGeneralError() < u2.getGeneralError() ? u1 : u2)
+//                .orElse(null);
     }
 
     private static StatisticsAndCoefficients executeVirusModelForOneSeason(Coefficients coefficients, String dataFilename) {
@@ -103,7 +135,7 @@ public class VirusModelService {
     public static double getCorrelationCoefficient(List<Double> countedData, List<Double> statisticsData) {
         double correlationCoefficient = 0;
         if (countedData.size() != statisticsData.size())
-            throw new IllegalArgumentException("List counted data has another size as statistics data");
+            statisticsData = statisticsData.subList(0, countedData.size());
 
         double avgCountedData = countedData.stream().mapToDouble(Double::doubleValue).sum() / countedData.size();
         double avgStatisticsData = statisticsData.stream().mapToDouble(Double::doubleValue).sum() / statisticsData.size();
@@ -111,20 +143,20 @@ public class VirusModelService {
         List<Double> deviationCountedData = new ArrayList<>();
         List<Double> deviationStatisticsData = new ArrayList<>();
         for (int i = 0; i < countedData.size(); i++) {
-            deviationCountedData.set(i, avgCountedData - countedData.get(i));
-            deviationStatisticsData.set(i, avgStatisticsData - statisticsData.get(i));
+            deviationCountedData.add(avgCountedData - countedData.get(i));
+            deviationStatisticsData.add(avgStatisticsData - statisticsData.get(i));
         }
 
         List<Double> squareDeviationCountedData = new ArrayList<>();
         List<Double> squareDeviationStatisticsData = new ArrayList<>();
         for (int i = 0; i < countedData.size(); i++) {
-            squareDeviationCountedData.set(i, Math.pow(deviationCountedData.get(i), 2));
-            squareDeviationStatisticsData.set(i, Math.pow(deviationStatisticsData.get(i), 2));
+            squareDeviationCountedData.add(Math.pow(deviationCountedData.get(i), 2));
+            squareDeviationStatisticsData.add(Math.pow(deviationStatisticsData.get(i), 2));
         }
 
         List<Double> composition = new ArrayList<>();
         for (int i = 0; i < countedData.size(); i++) {
-            composition.set(i, deviationCountedData.get(i) * deviationStatisticsData.get(i));
+            composition.add(deviationCountedData.get(i) * deviationStatisticsData.get(i));
         }
 
         double sumSquareDeviationCountedData = squareDeviationCountedData.stream().mapToDouble(Double::doubleValue).sum();
