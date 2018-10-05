@@ -18,4 +18,10 @@ public class OutputService {
     public static void showGeneralError(double generalError) {
         System.out.println("General error: " + generalError);
     }
+
+    public static void showCorrelationCoefficients( double gcorCoef, double vcorCoef, double icorCoef) {
+        System.out.println("Coefficient correlation G: " + Math.abs(gcorCoef));
+        System.out.println("Coefficient correlation V: " + Math.abs(vcorCoef));
+        System.out.println("Coefficient correlation I: " + Math.abs(icorCoef));
+    }
 }

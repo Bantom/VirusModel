@@ -42,6 +42,9 @@ public class VirusModelService {
             double gcorCoef = getCorrelationCoefficient(g, gStatistics);
             double vcorCoef = getCorrelationCoefficient(v, vStatistics);
             double icorCoef = getCorrelationCoefficient(i, iStatistics);
+            listStatistics.get(j).setGcorCoef(gcorCoef);
+            listStatistics.get(j).setVcorCoef(vcorCoef);
+            listStatistics.get(j).setIcorCoef(icorCoef);
             sumCorrelationCoefficients.add(j, Math.abs(gcorCoef) + Math.abs(vcorCoef) + Math.abs(icorCoef));
         }
         OptionalDouble maxValue = sumCorrelationCoefficients.stream().mapToDouble(Double::doubleValue).max();

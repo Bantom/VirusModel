@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 public class Main {
 
     private static final int quantityOfPeople = 2000;
-    private static final int quantityOfExperiments = 5;
-    private static final int quantityOfExperimentsForCoefficients = 5;
+    private static final int quantityOfExperiments = 2;
+    private static final int quantityOfExperimentsForCoefficients = 2;
     private static final String FILE_NAME = "Data.xlsx";
 
     private static TimeLogging timeLogging = new TimeLogging();
@@ -26,6 +26,7 @@ public class Main {
 
         OutputService.showStatisticsGVI(result.getStatisticsGVI());
         OutputService.showCoefficients(result.getCoefficients());
+        OutputService.showCorrelationCoefficients(result.getGcorCoef(), result.getVcorCoef(), result.getIcorCoef());
         OutputService.showGeneralError(result.getGeneralError());
     }
 }
