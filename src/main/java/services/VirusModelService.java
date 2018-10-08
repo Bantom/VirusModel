@@ -3,9 +3,7 @@ package services;
 import excel.ImportFromExcel;
 import model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class VirusModelService {
@@ -30,8 +28,7 @@ public class VirusModelService {
         List<Double> vStatistics = staticticsFromFile.stream().map(StatisticsGVI::getV).collect(Collectors.toList());
         List<Double> iStatistics = staticticsFromFile.stream().map(StatisticsGVI::getI).collect(Collectors.toList());
 
-        List<Double> sumCorrelationCoefficients = new ArrayList<>();
-
+        Map<Double, StatisticsAndCoefficients> bestByCorrelationCoefficients = new TreeMap<>();
 
         for (int j = 0; j < listStatistics.size(); j++) {
             List<StatisticsGVI> statisticsGVI = listStatistics.get(j).getStatisticsGVI();
@@ -45,22 +42,20 @@ public class VirusModelService {
             listStatistics.get(j).setGcorCoef(gcorCoef);
             listStatistics.get(j).setVcorCoef(vcorCoef);
             listStatistics.get(j).setIcorCoef(icorCoef);
-            sumCorrelationCoefficients.add(j, Math.abs(gcorCoef) + Math.abs(vcorCoef) + Math.abs(icorCoef));
+            bestByCorrelationCoefficients.put(Math.abs(gcorCoef) + Math.abs(vcorCoef) + Math.abs(icorCoef), listStatistics.get(j));
         }
-        OptionalDouble maxValue = sumCorrelationCoefficients.stream().mapToDouble(Double::doubleValue).max();
 
-        int numberOfBestExperiment = 0;
-        for (int i = 0; i < sumCorrelationCoefficients.size(); i++) {
-            if (sumCorrelationCoefficients.get(i) == maxValue.getAsDouble()) {
-                numberOfBestExperiment = i;
-                break;
-            }
+        List<StatisticsAndCoefficients> listTops = new ArrayList<>();
+
+        ArrayList<Double> keys = new ArrayList<>(bestByCorrelationCoefficients.keySet());
+        for (int i = 0; i <= Math.round(listStatistics.size() * 0.2) + 1; i++) {
+            listTops.add(bestByCorrelationCoefficients.get(keys.get(keys.size() - 1 - i)));
         }
-        return listStatistics.get(numberOfBestExperiment);
 
-//        return listStatistics.stream()
-//                .reduce((u1, u2) -> u1.getGeneralError() < u2.getGeneralError() ? u1 : u2)
-//                .orElse(null);
+
+        return listTops.stream()
+                .reduce((u1, u2) -> u1.getGeneralError() < u2.getGeneralError() ? u1 : u2)
+                .orElse(null);
     }
 
     private static StatisticsAndCoefficients executeVirusModelForOneSeason(Coefficients coefficients, String dataFilename) {
@@ -82,8 +77,11 @@ public class VirusModelService {
         for (int week = 0; week < 33; week++) {
             agents = Actions.vaccinatePeopleFromS(week, vectorS, agents);
 
-            List<Integer> newVectorG = Actions.movePeopleFromStoG(vectorS, vectorG, matrixContacts, vectorRG);
-            vectorS = Utils.vectorMinusVector(vectorS, newVectorG);
+            List<Integer> newVectorG = Collections.emptyList();
+            if (coefficients.isAnotherIll()) {
+                newVectorG = Actions.movePeopleFromStoG(vectorS, vectorG, matrixContacts, vectorRG);
+                vectorS = Utils.vectorMinusVector(vectorS, newVectorG);
+            }
 
             VectorsDTO tmp = Actions.movePeopleFromStoI(vectorS, vectorI, matrixContacts, vectorRI, agents);
             List<Integer> newVectorI = tmp.getVectorI();
@@ -93,12 +91,15 @@ public class VirusModelService {
             vectorY = Actions.movePeopleFromItoY(vectorI, coefficients);
             vectorI = Utils.vectorMinusVector(vectorI, vectorY);
 
-            vectorS = Actions.movePeopleFromOtoS(vectorO, vectorS);
-            vectorO = Actions.movePeopleFromGtoO(vectorG, coefficients);
-            vectorS = Actions.movePeopleFromGtoS(vectorG, vectorS);
+            if(coefficients.isAnotherIll()) {
+                vectorS = Actions.movePeopleFromOtoS(vectorO, vectorS);
+                vectorO = Actions.movePeopleFromGtoO(vectorG, coefficients);
+                vectorS = Actions.movePeopleFromGtoS(vectorG, vectorS);
+                vectorG = newVectorG;
+            }
             vectorS = Actions.movePeopleFromItoS(vectorI, vectorS);
             vectorI = newVectorI;
-            vectorG = newVectorG;
+
 
             statisticsForSeason.add(new StatisticsGVI(StatisticsService.getStatisticsG(vectorG), StatisticsService.getStatisticsV(agents), StatisticsService.getStatisticsI(vectorI)));
         }

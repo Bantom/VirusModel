@@ -52,8 +52,11 @@ public class InstantiationService {
         List<Agent> agents = getAgents(coefficients.getQuantityOfPeople());
         List<Integer> vectorI = Utils.getVectorsWithRandomOneOrZeroValues(coefficients.getQuantityOfPeople());
         List<Integer> vectorS = Utils.vectorMinusVector(Utils.getVectorWithValuesOne(coefficients.getQuantityOfPeople()), vectorI);
-        List<Integer> vectorG = initVectorG(vectorI);
-        vectorI = Utils.vectorMinusVector(vectorI, vectorG);
+        List<Integer> vectorG = Utils.getVectorWithZeroValues(coefficients.getQuantityOfPeople());
+        if(coefficients.isAnotherIll()) {
+            vectorG = initVectorG(vectorI);
+            vectorI = Utils.vectorMinusVector(vectorI, vectorG);
+        }
         agents = becameIllPeopleFromVectorI(vectorI, agents);
         MatrixContacts matrixContacts = initMatrixContacts(coefficients);
         List<Integer> vectorRG = getVectorWithRandomElement(matrixContacts, coefficients);

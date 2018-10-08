@@ -7,7 +7,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @ToString
 public class Coefficients {
 
@@ -20,4 +19,17 @@ public class Coefficients {
     private double complicationProbabilityY;
     private double complicationProbabilityO;
     private double susceptibleProbability;
+    private boolean anotherIll = true;
+
+    public Coefficients(int quantityOfPeople, int minPeoples, int maxPeoples, int minContactsBecameIll, int maxContactsBecameIll, double probability, double complicationProbabilityY, double complicationProbabilityO, double susceptibleProbability) {
+        this.quantityOfPeople = quantityOfPeople;
+        this.minPeoples = minPeoples;
+        this.maxPeoples = maxPeoples;
+        this.minContactsBecameIll = minContactsBecameIll;
+        this.maxContactsBecameIll = maxContactsBecameIll;
+        this.probability = probability;
+        this.complicationProbabilityY = complicationProbabilityY;
+        this.complicationProbabilityO = complicationProbabilityO;
+        this.susceptibleProbability = susceptibleProbability;
+    }
 }
