@@ -42,16 +42,15 @@ public class VirusModelService {
             listStatistics.get(j).setGcorCoef(gcorCoef);
             listStatistics.get(j).setVcorCoef(vcorCoef);
             listStatistics.get(j).setIcorCoef(icorCoef);
-            bestByCorrelationCoefficients.put(Math.abs(gcorCoef) + Math.abs(vcorCoef) + Math.abs(icorCoef), listStatistics.get(j));
+            bestByCorrelationCoefficients.put(Math.abs(gcorCoef) + Math.abs(vcorCoef) * 0.1 + Math.abs(icorCoef), listStatistics.get(j));
         }
 
         List<StatisticsAndCoefficients> listTops = new ArrayList<>();
 
         ArrayList<Double> keys = new ArrayList<>(bestByCorrelationCoefficients.keySet());
-        for (int i = 0; i <= Math.round(listStatistics.size() * 0.2) + 1; i++) {
+        for (int i = 0; i < Math.round(listStatistics.size() * 0.05) + 1; i++) {
             listTops.add(bestByCorrelationCoefficients.get(keys.get(keys.size() - 1 - i)));
         }
-
 
         return listTops.stream()
                 .reduce((u1, u2) -> u1.getGeneralError() < u2.getGeneralError() ? u1 : u2)
@@ -91,7 +90,7 @@ public class VirusModelService {
             vectorY = Actions.movePeopleFromItoY(vectorI, coefficients);
             vectorI = Utils.vectorMinusVector(vectorI, vectorY);
 
-            if(coefficients.isAnotherIll()) {
+            if (coefficients.isAnotherIll()) {
                 vectorS = Actions.movePeopleFromOtoS(vectorO, vectorS);
                 vectorO = Actions.movePeopleFromGtoO(vectorG, coefficients);
                 vectorS = Actions.movePeopleFromGtoS(vectorG, vectorS);
@@ -100,6 +99,9 @@ public class VirusModelService {
             vectorS = Actions.movePeopleFromItoS(vectorI, vectorS);
             vectorI = newVectorI;
 
+            matrixContacts = dynamicChangesMatrixContacts(matrixContacts);
+            vectorRG = checkVectorR(vectorRG, matrixContacts);
+            vectorRI = checkVectorR(vectorRI, matrixContacts);
 
             statisticsForSeason.add(new StatisticsGVI(StatisticsService.getStatisticsG(vectorG), StatisticsService.getStatisticsV(agents), StatisticsService.getStatisticsI(vectorI)));
         }
@@ -136,7 +138,7 @@ public class VirusModelService {
      *
      * @return correlation coefficient
      */
-    public static double getCorrelationCoefficient(List<Double> countedData, List<Double> statisticsData) {
+    private static double getCorrelationCoefficient(List<Double> countedData, List<Double> statisticsData) {
         double correlationCoefficient = 0;
         if (countedData.size() != statisticsData.size())
             statisticsData = statisticsData.subList(0, countedData.size());
@@ -170,5 +172,50 @@ public class VirusModelService {
         correlationCoefficient = sumComposition / Math.sqrt(sumSquareDeviationCountedData * sumSquareDeviationStatisticsData);
 
         return correlationCoefficient;
+    }
+
+    private static MatrixContacts dynamicChangesMatrixContacts(MatrixContacts matrix) {
+        for (int i = 0; i < matrix.getQuantityOfPeople() - 1; i++) {
+            int quantityOfContacts = getQuantityOfContactsForPerson(i, matrix);
+            int quantityContactsToMove = (int) Math.round(quantityOfContacts * 0.1);
+            int movedContacts = 0;
+            for (int j = 0; j < matrix.getQuantityOfPeople() - 1; j++) {
+                if (movedContacts == quantityContactsToMove) {
+                    break;
+                }
+                if (i == j) {
+                    continue;
+                }
+                if (matrix.matrix[i][j] == 1) {
+                    int index = (int) (Math.random() * matrix.getQuantityOfPeople());
+                    if (index == i){
+                        continue;
+                    }
+                    matrix.matrix[i][j] = 0;
+                    matrix.matrix[j][i] = 0;
+                    matrix.matrix[i][index] = 1;
+                    matrix.matrix[index][i] = 1;
+                }
+            }
+        }
+        return matrix;
+    }
+
+    private static int getQuantityOfContactsForPerson(int i,MatrixContacts matrix) {
+        int quantity = 0;
+        for (int j = 0; j < matrix.getQuantityOfPeople(); j++) {
+            quantity += matrix.matrix[i][j];
+        }
+        return quantity;
+    }
+
+    private static List<Integer> checkVectorR(List<Integer> vectorR, MatrixContacts matrixContacts) {
+        for (int i = 0; i < vectorR.size(); i++) {
+            int quantityOfContacts = getQuantityOfContactsForPerson(i, matrixContacts);
+            if(vectorR.get(i) > quantityOfContacts) {
+                vectorR.set(i, quantityOfContacts);
+            }
+        }
+        return vectorR;
     }
 }
