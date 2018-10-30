@@ -99,9 +99,9 @@ public class VirusModelService {
             vectorS = Actions.movePeopleFromItoS(vectorI, vectorS);
             vectorI = newVectorI;
 
-            matrixContacts = dynamicChangesMatrixContacts(matrixContacts);
-            vectorRG = checkVectorR(vectorRG, matrixContacts);
-            vectorRI = checkVectorR(vectorRI, matrixContacts);
+//            matrixContacts = dynamicChangesMatrixContacts(matrixContacts);
+//            vectorRG = checkVectorR(vectorRG, matrixContacts);
+//            vectorRI = checkVectorR(vectorRI, matrixContacts);
 
             statisticsForSeason.add(new StatisticsGVI(StatisticsService.getStatisticsG(vectorG), StatisticsService.getStatisticsV(agents), StatisticsService.getStatisticsI(vectorI)));
         }
@@ -111,21 +111,21 @@ public class VirusModelService {
 
     private static double countGeneralError(String fileName, List<StatisticsGVI> statistics) {
         List<StatisticsGVI> staticticsFromFile = ImportFromExcel.readSeasonsFromFile(fileName);
-        double squareErrorI = 0;
-        double squareErrorG = 0;
-        double squareErrorV = 0;
+        double errorI = 0;
+        double errorG = 0;
+        double errorV = 0;
 
         for (int i = 0; i < 33; i++) {
-            squareErrorI += Math.pow(statistics.get(i).getI() - staticticsFromFile.get(i).getI(), 2);
-            squareErrorG += Math.pow(statistics.get(i).getG() - staticticsFromFile.get(i).getG(), 2);
-            squareErrorV += Math.pow(statistics.get(i).getV() - staticticsFromFile.get(i).getV(), 2);
+            errorI += Math.abs(statistics.get(i).getI() - staticticsFromFile.get(i).getI());
+            errorG += Math.abs(statistics.get(i).getG() - staticticsFromFile.get(i).getG());
+            errorV += Math.abs(statistics.get(i).getV() - staticticsFromFile.get(i).getV());
         }
 
-        squareErrorI = Math.sqrt(squareErrorI / (statistics.size() * (statistics.size() - 1)));
-        squareErrorG = Math.sqrt(squareErrorG / (statistics.size() * (statistics.size() - 1)));
-        squareErrorV = Math.sqrt(squareErrorV / (statistics.size() * (statistics.size() - 1)));
+        errorI = errorI / 33;
+        errorG = errorG / 33;
+        errorV = errorV / 33;
 
-        return squareErrorI + squareErrorG + squareErrorV;
+        return (errorI + errorG + errorV) / 3;
     }
 
     /**
@@ -139,7 +139,7 @@ public class VirusModelService {
      * @return correlation coefficient
      */
     private static double getCorrelationCoefficient(List<Double> countedData, List<Double> statisticsData) {
-        double correlationCoefficient = 0;
+        double correlationCoefficient;
         if (countedData.size() != statisticsData.size())
             statisticsData = statisticsData.subList(0, countedData.size());
 

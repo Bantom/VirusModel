@@ -11,16 +11,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class InstantiationService {
+class InstantiationService {
 
     static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
+        int minContactsBecameIll = (int) Math.round(0.1 * quantityOfPeople);
+        int maxContactsBecameIll = (int) Math.round(0.4 * quantityOfPeople);
         double probability = Math.random() / 10;
         double complicationProbabilityY = Math.random() / 10;
         double complicationProbabilityO = Math.random() / 10;
         double susceptibleProbability = Math.random() / 10;
-        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, 0, 8, probability, complicationProbabilityY, complicationProbabilityO, susceptibleProbability);
+        return new Coefficients(quantityOfPeople, minPeoples, maxPeoples, minContactsBecameIll, maxContactsBecameIll, probability, complicationProbabilityY, complicationProbabilityO, susceptibleProbability);
     }
 
     private static MatrixContacts initMatrixContacts(Coefficients coefficients) {
@@ -48,7 +50,7 @@ public class InstantiationService {
         return matrixContacts;
     }
 
-    public static VectorsDTO initVectors(Coefficients coefficients) {
+    static VectorsDTO initVectors(Coefficients coefficients) {
         List<Agent> agents = getAgents(coefficients.getQuantityOfPeople());
         List<Integer> vectorI = Utils.getVectorsWithRandomOneOrZeroValues(coefficients.getQuantityOfPeople());
         List<Integer> vectorS = Utils.vectorMinusVector(Utils.getVectorWithValuesOne(coefficients.getQuantityOfPeople()), vectorI);
@@ -87,7 +89,7 @@ public class InstantiationService {
         RandomDataGenerator binomialDistribution = new RandomDataGenerator();
         boolean flag;
         int value;
-        List<Integer> vectorWithRandomElements = new ArrayList<Integer>();
+        List<Integer> vectorWithRandomElements = new ArrayList<>();
         List<Integer> vectorContacts = getQuantityOfContacts(matrixContacts);
 
         for (int i = 0; i < matrixContacts.getQuantityOfPeople(); i++) {
@@ -104,7 +106,7 @@ public class InstantiationService {
     }
 
     private static List<Integer> getQuantityOfContacts(MatrixContacts matrixContacts) {
-        List<Integer> result = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<>();
 
         for (int i = 0; i < matrixContacts.getQuantityOfPeople(); i++) {
             result.add(0);
