@@ -1,4 +1,4 @@
-package services;
+package Simulation.services;
 
 import model.Agent;
 import model.Coefficients;
@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-class InstantiationService {
+public class InstantiationService {
 
     static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
-        int minContactsBecameIll = (int) Math.round(0.1 * quantityOfPeople);
-        int maxContactsBecameIll = (int) Math.round(0.4 * quantityOfPeople);
+        int minContactsBecameIll = (int) Math.round(0.01 * quantityOfPeople);
+        int maxContactsBecameIll = (int) Math.round(0.2 * quantityOfPeople);
         double probability = Math.random() / 10;
         double complicationProbabilityY = Math.random() / 10;
         double complicationProbabilityO = Math.random() / 10;
@@ -50,7 +50,7 @@ class InstantiationService {
         return matrixContacts;
     }
 
-    static VectorsDTO initVectors(Coefficients coefficients) {
+    public static VectorsDTO initVectors(Coefficients coefficients) {
         List<Agent> agents = getAgents(coefficients.getQuantityOfPeople());
         List<Integer> vectorI = Utils.getVectorsWithRandomOneOrZeroValues(coefficients.getQuantityOfPeople());
         List<Integer> vectorS = Utils.vectorMinusVector(Utils.getVectorWithValuesOne(coefficients.getQuantityOfPeople()), vectorI);

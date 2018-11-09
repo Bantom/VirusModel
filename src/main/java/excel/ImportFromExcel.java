@@ -1,5 +1,6 @@
 package excel;
 
+import model.Coefficients;
 import model.StatisticsGVI;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -42,5 +43,50 @@ public class ImportFromExcel {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public static Coefficients readCoefficientsFromFile(String fileName) {
+        Coefficients coefficients = new Coefficients();
+        try {
+            Workbook workbook = new XSSFWorkbook(new FileInputStream(new File(fileName)));
+            Sheet datatypeSheet = workbook.getSheetAt(0);
+            Row currentRow = datatypeSheet.getRow(1);
+            Iterator<Cell> cellIterator = currentRow.iterator();
+            int i = 1;
+            while (cellIterator.hasNext()) {
+                Cell currentCell = cellIterator.next();
+                if (i == 1) {
+                    coefficients.setQuantityOfPeople((int) currentCell.getNumericCellValue());
+                }
+                if (i == 2) {
+                    coefficients.setMinPeoples((int) currentCell.getNumericCellValue());
+                }
+                if (i == 3) {
+                    coefficients.setMaxPeoples((int) currentCell.getNumericCellValue());
+                }
+                if (i == 4) {
+                    coefficients.setMinContactsBecameIll((int) currentCell.getNumericCellValue());
+                }
+                if (i == 5) {
+                    coefficients.setMaxContactsBecameIll((int) currentCell.getNumericCellValue());
+                }
+                if (i == 6) {
+                    coefficients.setProbability(currentCell.getNumericCellValue());
+                }
+                if (i == 7) {
+                    coefficients.setComplicationProbabilityY(currentCell.getNumericCellValue());
+                }
+                if (i == 8) {
+                    coefficients.setComplicationProbabilityO(currentCell.getNumericCellValue());
+                }
+                if (i == 9) {
+                    coefficients.setSusceptibleProbability(currentCell.getNumericCellValue());
+                }
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return coefficients;
     }
 }

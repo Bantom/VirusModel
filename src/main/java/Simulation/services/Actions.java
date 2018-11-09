@@ -1,4 +1,4 @@
-package services;
+package Simulation.services;
 
 import model.Agent;
 import model.Coefficients;
@@ -6,7 +6,6 @@ import model.MatrixContacts;
 import model.VectorsDTO;
 
 import java.util.List;
-import java.util.Random;
 
 
 public class Actions {
