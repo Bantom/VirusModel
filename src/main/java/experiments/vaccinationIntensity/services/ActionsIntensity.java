@@ -1,4 +1,4 @@
-package Experiments.vaccinationIntensity.services;
+package experiments.vaccinationIntensity.services;
 
 import model.Agent;
 

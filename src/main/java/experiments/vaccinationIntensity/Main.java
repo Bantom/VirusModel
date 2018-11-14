@@ -1,8 +1,8 @@
-package Experiments.vaccinationIntensity;
+package experiments.vaccinationIntensity;
 
-import Experiments.vaccinationIntensity.dto.ServiceIntensityDTO;
-import Experiments.vaccinationIntensity.services.VirusModelServiceIntensity;
-import Simulation.services.OutputService;
+import experiments.vaccinationIntensity.dto.ServiceIntensityDTO;
+import experiments.vaccinationIntensity.services.VirusModelServiceIntensity;
+import simulation.services.OutputService;
 import Tools.TimeLogging;
 import lombok.extern.slf4j.Slf4j;
 

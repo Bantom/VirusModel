@@ -1,14 +1,14 @@
-package Experiments.vaccinationIntensity.services;
+package experiments.vaccinationIntensity.services;
 
-import Experiments.vaccinationIntensity.dto.ServiceIntensityDTO;
-import Simulation.services.*;
+import experiments.vaccinationIntensity.dto.ServiceIntensityDTO;
+import simulation.services.*;
 import excel.ImportFromExcel;
 import model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static Simulation.services.VirusModelService.*;
+import static simulation.services.VirusModelService.*;
 
 public class VirusModelServiceIntensity {
     public static List<ServiceIntensityDTO> executeVirusModel(int quantityOfSpans, double maxIntensity, String dataFilename, String coefficientsFilename) {
@@ -20,6 +20,9 @@ public class VirusModelServiceIntensity {
             StatisticsAndCoefficients statisticsAndCoefficients = executeVirusModelForOneSeason(coefficients, dataFilename, intensity);
             setCorrelationCoefficients(statisticsAndCoefficients, dataFilename);
             int weekWithZeroValue = findWeekWithZeroValue(statisticsAndCoefficients);
+            if (exp != 0) {
+                weekWithZeroValue = intensityList.get(exp - 1).getWeekNumber() < weekWithZeroValue ? intensityList.get(exp - 1).getWeekNumber() : weekWithZeroValue;
+            }
             intensityList.add(new ServiceIntensityDTO(
                     statisticsAndCoefficients.getGeneralError(),
                     statisticsAndCoefficients.getGcorCoef(),

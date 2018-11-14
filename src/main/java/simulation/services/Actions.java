@@ -1,4 +1,4 @@
-package Simulation.services;
+package simulation.services;
 
 import model.Agent;
 import model.Coefficients;
@@ -102,7 +102,7 @@ public class Actions {
         return isAgent == 1;
     }
 
-    private static double getPercentsStoV(int weekNumber) {
+    public static double getPercentsStoV(int weekNumber) {
         return (1 / (0.13 * Math.exp((weekNumber + 0.1) * 0.4)) + Math.random()) / 1000;
     }
 

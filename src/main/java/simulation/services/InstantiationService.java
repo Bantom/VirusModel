@@ -1,4 +1,4 @@
-package Simulation.services;
+package simulation.services;
 
 import model.Agent;
 import model.Coefficients;
@@ -16,8 +16,8 @@ public class InstantiationService {
     static Coefficients initCoefficients(int quantityOfPeople) {
         int minPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.025 - 0.00000001) + 0.00000001));
         int maxPeoples = (int) Math.round(quantityOfPeople * (Math.random() * (0.05 - 0.025) + 0.025));
-        int minContactsBecameIll = (int) Math.round(0.01 * quantityOfPeople);
-        int maxContactsBecameIll = (int) Math.round(0.2 * quantityOfPeople);
+        int minContactsBecameIll = (int) Math.round(0.001 * quantityOfPeople);
+        int maxContactsBecameIll = (int) Math.round(0.01 * quantityOfPeople);
         double probability = Math.random() / 10;
         double complicationProbabilityY = Math.random() / 10;
         double complicationProbabilityO = Math.random() / 10;

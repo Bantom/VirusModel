@@ -1,11 +1,11 @@
-package Simulation;
+package simulation;
 
 import Tools.TimeLogging;
 import excel.ExportToExcel;
 import lombok.extern.slf4j.Slf4j;
 import model.StatisticsAndCoefficients;
-import Simulation.services.OutputService;
-import Simulation.services.VirusModelService;
+import simulation.services.OutputService;
+import simulation.services.VirusModelService;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 public class Main {
 
     private static final int quantityOfPeople = 2000;
-    private static final int quantityOfExperiments = 20;
+    private static final int quantityOfExperiments = 50;
     private static final int quantityOfExperimentsForCoefficients = 5;
     private static final String FILE_NAME = "Data.xlsx";
 

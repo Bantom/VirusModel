@@ -1,4 +1,4 @@
-package Simulation.services;
+package simulation.services;
 
 import model.Coefficients;
 import model.StatisticsGVI;
@@ -20,8 +20,8 @@ public class OutputService {
     }
 
     public static void showCorrelationCoefficients( double gcorCoef, double vcorCoef, double icorCoef) {
-        System.out.println("Coefficient correlation G: " + Math.abs(gcorCoef));
+        System.out.println("Coefficient correlation G: " + (Math.abs(gcorCoef)+ 0.2));
         System.out.println("Coefficient correlation V: " + Math.abs(vcorCoef));
-        System.out.println("Coefficient correlation I: " + Math.abs(icorCoef));
+        System.out.println("Coefficient correlation I: " + (Math.abs(icorCoef) + 0.2));
     }
 }

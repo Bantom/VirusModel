@@ -1,10 +1,9 @@
-package Experiments.vaccinationIntensity.dto;
+package experiments.vaccinationIntensity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import model.Coefficients;
 
 @Setter
 @Getter

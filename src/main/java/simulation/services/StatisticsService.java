@@ -1,4 +1,4 @@
-package Simulation.services;
+package simulation.services;
 
 import model.Agent;
 

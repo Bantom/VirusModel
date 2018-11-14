@@ -1,4 +1,4 @@
-package Simulation.services;
+package simulation.services;
 
 import excel.ImportFromExcel;
 import model.*;
@@ -42,7 +42,8 @@ public class VirusModelService {
             listStatistics.get(j).setGcorCoef(gcorCoef);
             listStatistics.get(j).setVcorCoef(vcorCoef);
             listStatistics.get(j).setIcorCoef(icorCoef);
-            bestByCorrelationCoefficients.put(Math.abs(gcorCoef) + Math.abs(vcorCoef) * 0.1 + Math.abs(icorCoef), listStatistics.get(j));
+//            bestByCorrelationCoefficients.put(Math.abs(gcorCoef) + Math.abs(vcorCoef) * 0.1 + Math.abs(icorCoef) * 1.2, listStatistics.get(j));
+            bestByCorrelationCoefficients.put(Math.abs(icorCoef), listStatistics.get(j));
         }
 
         List<StatisticsAndCoefficients> listTops = new ArrayList<>();
@@ -57,7 +58,7 @@ public class VirusModelService {
                 .orElse(null);
     }
 
-    private static StatisticsAndCoefficients executeVirusModelForOneSeason(Coefficients coefficients, String dataFilename) {
+    public static StatisticsAndCoefficients executeVirusModelForOneSeason(Coefficients coefficients, String dataFilename) {
         List<StatisticsGVI> statisticsForSeason = new ArrayList<>();
 
         VectorsDTO vectors = InstantiationService.initVectors(coefficients);
@@ -99,9 +100,9 @@ public class VirusModelService {
             vectorS = Actions.movePeopleFromItoS(vectorI, vectorS);
             vectorI = newVectorI;
 
-            matrixContacts = dynamicChangesMatrixContacts(matrixContacts);
-            vectorRG = checkVectorR(vectorRG, matrixContacts);
-            vectorRI = checkVectorR(vectorRI, matrixContacts);
+//            matrixContacts = dynamicChangesMatrixContacts(matrixContacts);
+//            vectorRG = checkVectorR(vectorRG, matrixContacts);
+//            vectorRI = checkVectorR(vectorRI, matrixContacts);
 
             statisticsForSeason.add(new StatisticsGVI(StatisticsService.getStatisticsG(vectorG), StatisticsService.getStatisticsV(agents), StatisticsService.getStatisticsI(vectorI)));
         }
